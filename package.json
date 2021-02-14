@@ -1,0 +1,14 @@
+{
+    "name": "js-websocket-mock",
+    "version": "1.0.0",
+    "description": "Mock for substrate runtime",
+    "main": "server.js",
+    "scripts": {
+        "start": "node ws-server.js"
+    },
+    "keywords": [],
+    "author": "Stepan Lavrentev <lawrentievsv@gmail.com>",
+    "dependencies": {
+        "websocket": "^1.0.33"
+    }
+}
