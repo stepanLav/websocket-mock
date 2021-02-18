@@ -6,6 +6,9 @@ const WebSocketServer = require('websocket').server;
 const server = http.createServer();
 server.listen(9899);
 
+let subscriptionParameters = new Map<string, string>()
+
+
 const wsServer = new WebSocketServer({
     httpServer: server
 });
@@ -22,33 +25,50 @@ wsServer.on('request', function(request: any) {
       const receive = JSON.parse(message.utf8Data)
       switch(receive.method) {
         case 'state_subscribeStorage':
-            parseAndSend(responses.subscribe_storage, receive, connection)
+            setIdAndAnswered(responses.subscribe_storage, receive, connection)
             break
         case 'chain_subscribeRuntimeVersion':
-            responseBySubscription(responses.state_runtime_version, receive, connection)
+            subscribe(responses.subscribe_storage, receive, connection, receive.method, responses.state_runtime_version_current_westend)
             break
         case 'system_chain':
-            parseAndSend(responses.networkType, receive, connection)
+            setIdAndAnswered(responses.networkType, receive, connection)
             break
         case 'chain_getBlock':
-            parseAndSend(responses.block, receive, connection)
+            setIdAndAnswered(responses.block, receive, connection)
             break
         case 'state_getStorage':
-            parseAndSend(responses.storage, receive, connection)
+            setIdAndAnswered(responses.storage, receive, connection)
+            break
+        case 'state_getMetadata':
+            console.log('<<<<<<<==========\nGet Metadata!!!!!!!!!!!!!!!!!!!!!!!!!!\n')
+            setIdAndAnswered(responses.kusama_metadata, receive, connection)
             break
       }
     });
 });
 
-function parseAndSend(responseJSON: any, receive: any, connection: any) {
+function setIdAndAnswered(responseJSON: any, receive: any, connection: any) {
     responseJSON.id = receive.id
     const response = JSON.stringify(responseJSON)
     connection.sendUTF(response)
     console.log('<<<<<<<==========\nSend message:\n', response)
 }
 
-function responseBySubscription(responseJSON: any, receive: any, connection: any) {
+function subscribe(responseJSON: any, receive: any, connection: any, method: any, subscribeAnswer: any) {
+    const subscriptionCode = Math.random().toString(36).substring(7);
+    responseJSON.id = receive.id
+    responseJSON.result = subscriptionCode
+    subscriptionParameters.set(method, subscriptionCode)
     const response = JSON.stringify(responseJSON)
     connection.sendUTF(response)
-    console.log('<<<<<<<==========\nSend message:\nWith subscription!!\n', response)
+    console.log('<<<<<<<==========\nSend message:\nSubscribe!!\n', response)
+    sendSubscriptionMessage(method, subscribeAnswer, connection)
+}
+
+function sendSubscriptionMessage(method: any, subscribeAnswer: any, connection: any) {
+    subscribeAnswer.params.subscription = subscriptionParameters.get(method)
+    const response = JSON.stringify(subscribeAnswer)
+    connection.sendUTF(response)
+    console.log('<<<<<<<==========\nSend message:\nFor subscription!!\n' +subscribeAnswer.params.subscription, response)
+    subscriptionParameters.delete(method)
 }
