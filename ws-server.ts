@@ -13,37 +13,51 @@ const wsServer = new WebSocketServer({
     httpServer: server
 });
 
-console.log("==============================================\n"+
-"WEB-SOCKET SERVER WAS STARTED !\n"+
-"==============================================\n")
+console.log("==============================================\n" +
+    "WEB-SOCKET SERVER WAS STARTED !\n" +
+    "==============================================\n")
 
-wsServer.on('request', function(request: any) {
+wsServer.on('request', function (request: any) {
     const connection = request.accept(null, request.origin);
 
-    connection.on('message', function(message: any) {
-      console.log('========>>>>>>>>\nReceived Message:\n', message.utf8Data);
-      const receive = JSON.parse(message.utf8Data)
-      switch(receive.method) {
-        case 'state_subscribeStorage':
-            setIdAndAnswered(responses.subscribe_storage, receive, connection)
-            break
-        case 'chain_subscribeRuntimeVersion':
-            subscribe(responses.subscribe_storage, receive, connection, receive.method, responses.state_runtime_version_current_westend)
-            break
-        case 'system_chain':
-            setIdAndAnswered(responses.networkType, receive, connection)
-            break
-        case 'chain_getBlock':
-            setIdAndAnswered(responses.block, receive, connection)
-            break
-        case 'state_getStorage':
-            setIdAndAnswered(responses.storage, receive, connection)
-            break
-        case 'state_getMetadata':
-            console.log('<<<<<<<==========\nGet Metadata!!!!!!!!!!!!!!!!!!!!!!!!!!\n')
-            setIdAndAnswered(responses.kusama_metadata, receive, connection)
-            break
-      }
+    connection.on('message', function (message: any) {
+        let receive
+        if (message.type == 'binary') {
+            console.log('Received Binary Message of ' + message.binaryData.length + ' bytes');
+            let str = new TextDecoder().decode(message.binaryData)
+            console.log('========>>>>>>>>\nConvert Message from Binary:\n', str)
+            receive = JSON.parse(str)
+        } else {
+            console.log('========>>>>>>>>\nReceived Message:\n', message.utf8Data);
+            receive = JSON.parse(message.utf8Data)
+        }
+        switch (receive.method) {
+            case 'state_subscribeStorage':
+                setIdAndAnswered(responses.subscribe_storage, receive, connection)
+                break
+            case 'chain_subscribeRuntimeVersion': //Android
+                subscribe(responses.subscribe_storage, receive, connection, receive.method, responses.state_runtime_version_current_westend)
+                break
+            case 'state_subscribeRuntimeVersion': //iOS
+                subscribe(responses.subscribe_storage, receive, connection, receive.method, responses.state_runtime_sora)
+                break
+            case 'system_chain':
+                setIdAndAnswered(responses.networkType, receive, connection)
+                break
+            case 'chain_getBlock':
+                setIdAndAnswered(responses.block, receive, connection)
+                break
+            case 'state_getStorage':
+                setIdAndAnswered(responses.storage, receive, connection)
+                break
+            case 'state_getMetadata':
+                console.log('<<<<<<<==========\nGet Metadata!!!!!!!!!!!!!!!!!!!!!!!!!!\n')
+                setIdAndAnswered(responses.sora_metadata, receive, connection)
+                break
+            case 'system_health':
+                setIdAndAnswered(responses.ping_receive, receive, connection)
+                break
+        }
     });
 });
 
@@ -69,6 +83,6 @@ function sendSubscriptionMessage(method: any, subscribeAnswer: any, connection: 
     subscribeAnswer.params.subscription = subscriptionParameters.get(method)
     const response = JSON.stringify(subscribeAnswer)
     connection.sendUTF(response)
-    console.log('<<<<<<<==========\nSend message:\nFor subscription!!\n' +subscribeAnswer.params.subscription, response)
+    console.log('<<<<<<<==========\nSend message:\nFor subscription!!\n' + subscribeAnswer.params.subscription, response)
     subscriptionParameters.delete(method)
 }
