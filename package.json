@@ -9,6 +9,7 @@
     "keywords": [],
     "author": "Stepan Lavrentev <lawrentievsv@gmail.com>",
     "dependencies": {
+        "@polkadot/typegen": "^3.11.1",
         "ts-node": "^9.1.1",
         "websocket": "^1.0.33"
     },

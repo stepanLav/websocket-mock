@@ -1,4 +1,5 @@
-import * as responses from "./response-objects";
+import * as encode from "./utils/encoding"
+import { getNetworkType, responseConstructor, networks, getRuntimeVersion, getBlock, getMetadata, metadataType, ping, feeConstructor, keysPaged } from "./utils/getters"
 
 const http = require('http');
 const WebSocketServer = require('websocket').server;
@@ -8,6 +9,9 @@ server.listen(9899);
 
 let subscriptionParameters = new Map<string, string>()
 
+
+const network = networks.westend
+const versionRuntime = 51
 
 const wsServer = new WebSocketServer({
     httpServer: server
@@ -33,36 +37,49 @@ wsServer.on('request', function (request: any) {
         }
         switch (receive.method) {
             case 'state_subscribeStorage':
-                setIdAndAnswered(responses.subscribe_storage, receive, connection)
+                setIdAndAnswered(responseConstructor(), receive, connection)
                 break
             case 'chain_subscribeRuntimeVersion': //Android
-                subscribe(responses.subscribe_storage, receive, connection, receive.method, responses.state_runtime_version_current_westend)
+                subscribe(responseConstructor(), receive, connection, receive.method, getRuntimeVersion(network, versionRuntime))
                 break
             case 'state_subscribeRuntimeVersion': //iOS
-                subscribe(responses.subscribe_storage, receive, connection, receive.method, responses.state_runtime_sora)
+                subscribe(responseConstructor(), receive, connection, receive.method, getRuntimeVersion(network, versionRuntime))
                 break
             case 'system_chain':
-                setIdAndAnswered(responses.networkType, receive, connection)
+                setIdAndAnswered(getNetworkType(network), receive, connection)
                 break
             case 'chain_getBlock':
-                setIdAndAnswered(responses.block, receive, connection)
+                setIdAndAnswered(responseConstructor(getBlock()), receive, connection)
                 break
             case 'state_getStorage':
-                setIdAndAnswered(responses.storage, receive, connection)
+                setIdAndAnswered(responseConstructor("0xf00c000001104e2b9477010000"), receive, connection)
                 break
             case 'state_getMetadata':
                 console.log('<<<<<<<==========\nGet Metadata!!!!!!!!!!!!!!!!!!!!!!!!!!\n')
-                setIdAndAnswered(responses.sora_metadata, receive, connection)
+                setIdAndAnswered(getMetadata(network, metadataType.old), receive, connection, true)
                 break
             case 'system_health':
-                setIdAndAnswered(responses.ping_receive, receive, connection)
+                setIdAndAnswered(ping(), receive, connection)
                 break
+            case 'payment_queryInfo':
+                setIdAndAnswered(responseConstructor(feeConstructor()), receive, connection)
+            case 'system_accountNextIndex':
+                setIdAndAnswered(responseConstructor(7), receive, connection)
+            case 'chain_getRuntimeVersion':
+                setIdAndAnswered(getRuntimeVersion(network, versionRuntime, true), receive,  connection)
+            case 'state_getKeysPaged':
+                setIdAndAnswered(responseConstructor(keysPaged()), receive, connection)
+            case 'irohaMigration_needsMigration':
+                setIdAndAnswered(responseConstructor(true), receive, connection)
         }
     });
 });
 
-function setIdAndAnswered(responseJSON: any, receive: any, connection: any) {
+function setIdAndAnswered(responseJSON: any, receive: any, connection: any, change_result?:boolean) {
     responseJSON.id = receive.id
+    if(change_result){
+        responseJSON.result = encode.metadataChange(responseJSON.result)
+    }
     const response = JSON.stringify(responseJSON)
     connection.sendUTF(response)
     console.log('<<<<<<<==========\nSend message:\n', response)
