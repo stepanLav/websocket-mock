@@ -9,8 +9,8 @@ export function metadataChange(metadata:string): string {
     let initMetadata = initMeta(metadata)
     const infoMeta = initMetadata.metadata.toHuman()
     const modules = initMetadata.metadata.asLatest.modules[8].get("constants")
-    const value = (modules as any)[3].get("value")
-    value[0] = 200
+    const value = (modules as any)[1].get("value")
+    value[0] = 3
     initMetadata.metadata.asLatest.modules[8] = modules as any
     const result = initMetadata.metadata.toHex()
     return result

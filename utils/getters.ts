@@ -1,3 +1,6 @@
+import { metadataChange } from "./encoding";
+
+
 export enum networks {
     kusama = "kusama",
     westend = "westend",
@@ -16,16 +19,20 @@ export function getNetworkType(network: networks): JSON {
     return networkJson
 }
 
-export function responseConstructor(result: string | number | boolean = 'IRGVgwy0EOGw4lBh'): JSON {
-    const response = `{jsonrpc: "2.0",result: ${result},id: ''}`
-    return JSON.parse(response)
+export function responseConstructor(result: any = "IRGVgwy0EOGw4lBh"): JSON {
+    let convertedResult = result
+    if (result[0] == "{" || result[0] == "[") convertedResult = JSON.parse(result)
+    const response = `{"jsonrpc": "2.0","result": "","id": 1}`
+    const jObj = JSON.parse(response)
+    jObj.result = convertedResult
+    return jObj
 }
 
 export function getRuntimeVersion(network: networks, version: number, byID = false) {
     let networkJson
     if (byID) {
         networkJson = require(`./data/stateRuntimeVersion/versionByID/${network}.json`)
-        networkJson.params.result.specVersion = version
+        networkJson.result.specVersion = version
         return networkJson
     }
     networkJson = require(`./data/stateRuntimeVersion/${network}.json`)
@@ -33,23 +40,28 @@ export function getRuntimeVersion(network: networks, version: number, byID = fal
     return networkJson
 }
 
-export function getBlock() {
+export function getBlock(): string {
     const block = require("./data/blocks/block.json")
-    return block
+    return JSON.stringify(block)
 }
 
-export function getMetadata(network: networks, metadataType: metadataType): JSON {
+export function getMetadata(network: networks, metadataType: metadataType, modify = false): JSON {
     const metadata = require(`./data/metadata/${metadataType}/${network}.json`)
-    return metadata
+    let returnedMeta = metadata
+    if (modify) {
+        const changedMeta = metadataChange(metadata.result)
+        returnedMeta.result = changedMeta
+    }
+    return returnedMeta
 }
 
-export function ping(isSyncing = false, peers = 58, shouldHavePeers = true){
-    const result = `{ isSyncing: ${isSyncing}, peers: ${peers}, shouldHavePeers: ${shouldHavePeers} }`
-    return result
+export function ping(isSyncing = false, peers = 58, shouldHavePeers = true) {
+    const result = `{ "isSyncing": ${isSyncing}, "peers": ${peers}, "shouldHavePeers": ${shouldHavePeers}, "id": 1 }`
+    return JSON.parse(result)
 }
 
-export function feeConstructor (partialFee: string = "150000016", classFee: string = "normal", weight: number = 202714000): string {
-    const fee = `{ class: ${classFee}, partialFee: ${partialFee}, weight: ${weight} }`
+export function feeConstructor(partialFee: string = "150000016", classFee: string = "normal", weight: number = 202714000): string {
+    const fee = `{ "class": "${classFee}", "partialFee": "${partialFee}", "weight": ${weight} }`
     return fee
 }
 
