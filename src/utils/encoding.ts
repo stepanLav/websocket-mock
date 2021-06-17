@@ -1,5 +1,4 @@
 import { initMeta } from '@polkadot/typegen/util'
-import { u8aToHex, u8aToString } from '@polkadot/util';
 
 /*
 1. Encoding/Decoding metadata.
