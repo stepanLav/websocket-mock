@@ -2,9 +2,9 @@
     "name": "ts-websocket-mock",
     "version": "1.0.0",
     "description": "Mock for substrate runtime",
-    "main": "ws-server.ts",
+    "main": "src/App.ts",
     "scripts": {
-        "start": "ts-node ws-server.ts"
+        "start": "ts-node src/App.ts"
     },
     "keywords": [],
     "author": "Stepan Lavrentev <lawrentievsv@gmail.com>",
