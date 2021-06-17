@@ -13,7 +13,7 @@ import {
 import { Server } from "./utils/server"
 
 
-const server = new Server(networks.kusama, 9899, 2031)
+const server = new Server(networks.kusama, 9899, 9009)
 
 server.wsServer.on('request', function (request: any) {
     const connection = request.accept(null, request.origin);
