@@ -1,3 +1,4 @@
+import { readFileSync } from 'fs';
 export interface Network {
     url: string
     type: NetworkType
@@ -11,8 +12,10 @@ export enum NetworkType {
 }
 
 export class Polkadot implements Network {
-    url = 'wss://polkadot.api.onfinality.io/public-ws'
+    // url = 'wss://polkadot.api.onfinality.io/public-ws'
+    url = 'wss://polkadot.elara.patract.io'
     type = NetworkType.polkadot
+    metadata = readFileSync('./src/utils/data/metadata/current/polkadot.json','utf8')
 }
 
 export class Kusama implements Network {
@@ -23,6 +26,7 @@ export class Kusama implements Network {
 export class Westend implements Network {
     url = 'wss://westend.api.onfinality.io/public-ws'
     type = NetworkType.westend
+    metadata = readFileSync('./src/utils/data/metadata/current/westend.json','utf8')
 }
 
 export class Rococo implements Network {
