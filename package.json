@@ -2,18 +2,20 @@
     "name": "ts-websocket-mock",
     "version": "1.0.0",
     "description": "Mock for substrate runtime",
-    "main": "ws-server.ts",
+    "main": "src/App.ts",
     "scripts": {
-        "start": "ts-node ws-server.ts"
+        "start": "ts-node src/App.ts"
     },
     "keywords": [],
     "author": "Stepan Lavrentev <lawrentievsv@gmail.com>",
     "dependencies": {
-        "ts-node": "^9.1.1",
-        "websocket": "^1.0.33"
+        "@polkadot/typegen": "^4.11.2",
+        "ts-node": "^10.0.0",
+        "ws": "^7.5.0"
     },
     "devDependencies": {
-        "@types/node": "^14.14.27",
-        "typescript": "^4.1.5"
+        "@types/node": "^15.6.1",
+        "@types/ws": "^7.4.5",
+        "typescript": "^4.3.2"
     }
 }
