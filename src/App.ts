@@ -2,7 +2,7 @@ import WebSocket from 'ws';
 import { Kusama, Polkadot, Westend } from "./utils"
 import { UserCase, DecisionMaker } from './utils/decisionMaker';
 import { metadataInteraction } from './utils/encoding/encoding';
-import { changeMaxNominatorCount, changeMetadataCase, changeMinNomBound } from './utils/Methods';
+import { changeMaxNominatorCount, changeMetadataCase, changeMinNomBound, changeTotalIssuance, changeBalance } from './utils/Methods';
 
 
 const port = 8080
