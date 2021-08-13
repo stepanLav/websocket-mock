@@ -45,42 +45,55 @@ export class DecisionMaker {
     public fromSubstrate(message: string): string {
         let jsonMessage = JSON.parse(message)
 
-        const changeData = (message: any) => {
-            message.params.result.changes.forEach((element: any[]) => {
-                if (element.find(i => i == this.case.changes.matchedValue))
-                    element[1] = this.case.changes.changeValueInstance
-            })
-            this.savedMessage = message
+        if (this.hasInSubList(jsonMessage)) {
+            this.savedMessage = this.changeData(jsonMessage)
         }
-
-        if(this.hasInSubList(jsonMessage)){
-            changeData(jsonMessage)
-        }
-
         this.hasInIDList(jsonMessage)
 
         return JSON.stringify(jsonMessage)
     }
 
     private hasInIDList(jsonMessage: any): boolean {
+        if (typeof jsonMessage.result === typeof "") {
+            if (this.idList.find(id => id == jsonMessage.id)) {
+                this.idList.pop()
+                this.subscribeList.push(
+                    jsonMessage.result)
+                return true
+            }
+            return false
+        }
         if (this.idList.find(id => id == jsonMessage.id)) {
-            this.idList.pop()
-            this.subscribeList.push(
-                jsonMessage.result)
+            this.savedMessage = this.changeData(jsonMessage)
             return true
         }
         return false
     }
 
+    private changeData(message: any) {
+        if(message.params){
+            message.params.result.changes.forEach((element: any[]) => {
+                if (element.find(i => i == this.case.changes.matchedValue))
+                    element[1] = this.case.changes.changeValueInstance
+            })
+            return message
+        }
+        message.result[0].changes.forEach((element: any[]) => {
+            if (element.find(i => i == this.case.changes.matchedValue))
+                element[1] = this.case.changes.changeValueInstance
+        })
+        return message
+    }
+
     private hasInSubList(jsonMessage: any): boolean {
         let subscription
-        try{
+        try {
             subscription = this.subscribeList.find(
-            sub => sub == jsonMessage.params.subscription)
+                sub => sub == jsonMessage.params.subscription)
             if (subscription) return true
             return false
         }
-        catch {return false}
+        catch { return false }
     }
 
     private matchedMetod(jsonMessage: any): boolean {

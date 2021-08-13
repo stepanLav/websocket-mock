@@ -21,10 +21,11 @@ export class Polkadot implements Network {
 export class Kusama implements Network {
     url = 'wss://kusama.api.onfinality.io/public-ws'
     type = NetworkType.kusama
+    metadata = readFileSync('./src/utils/data/metadata/current/kusama.json','utf8')
 }
 
 export class Westend implements Network {
-    url = 'wss://westend.api.onfinality.io/public-ws'
+    url = 'wss://westend.elara.patract.io'
     type = NetworkType.westend
     metadata = readFileSync('./src/utils/data/metadata/current/westend.json','utf8')
 }
