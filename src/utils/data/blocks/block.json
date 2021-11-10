@@ -1,0 +1,17 @@
+{
+    "block": {
+        "extrinsics": ["0x280402000be058e6947701"],
+        "header": {
+            "digest": {
+                "logs": ["0x0642414245340201000000625a061000000000",
+                    "0x054241424501010e25d96a1d3b4a3bed372e9b16a80b236903f6f8829d14034bf50d6025f353571096fbc6820423b1b3e3ce01fb59856975dee10e045ccd0e20b52a32878df186"
+                ]
+            },
+            "extrinsicsRoot": "0xbcf7c2e3c8512026da13d7432467b582a76667866d152c4d9ab135f9fc6c2cfe",
+            "number": "0x4264b6",
+            "parentHash": "0x8936a326787f02d4d3729d98dfd258b1d577794b07f439a37eb55881242614af",
+            "stateRoot": "0x64a78cfcd356425ef8fa459dad3a9808e55336a97948a3dba8a3e22929915b53"
+        }
+    },
+    "justification": null
+}
